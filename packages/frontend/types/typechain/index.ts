@@ -2,7 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { Multicall } from "./Multicall";
+export type { Staking } from "./Staking";
 export type { YourContract } from "./YourContract";
 
 export { Multicall__factory } from "./factories/Multicall__factory";
+export { Staking__factory } from "./factories/Staking__factory";
 export { YourContract__factory } from "./factories/YourContract__factory";

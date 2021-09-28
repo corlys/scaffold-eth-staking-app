@@ -1,11 +1,21 @@
+import { useEffect, useState } from 'react'
 import { Box, Button, Divider, Heading, Input, Text } from '@chakra-ui/react'
 import { ChainId, useEthers, useSendTransaction } from '@usedapp/core'
+import {
+  useBalance,
+  useDeadline,
+  useOwner,
+  useContractBalance,
+  useContract,
+} from '../hooks/index'
 import { ethers, providers, utils } from 'ethers'
 import React, { useReducer } from 'react'
 import { YourContract as LOCAL_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
+import StakeContract from '../artifacts/contracts/Staking.sol/Staking.json'
 import YourContract from '../artifacts/contracts/YourContract.sol/YourContract.json'
 import { Layout } from '../components/layout/Layout'
 import { YourContract as YourContractType } from '../types/typechain'
+import { Balance } from '../components/Balance'
 
 /**
  * Constants & Helpers
@@ -15,7 +25,8 @@ const localProvider = new providers.StaticJsonRpcProvider(
   'http://localhost:8545'
 )
 
-const ROPSTEN_CONTRACT_ADDRESS = '0x6b61a52b1EA15f4b8dB186126e980208E1E18864'
+export const ROPSTEN_CONTRACT_ADDRESS =
+  '0x8E3241B5a5E186D640626c0aB5545C3201EA7D40'
 
 /**
  * Prop Types
@@ -24,7 +35,12 @@ type StateType = {
   greeting: string
   inputValue: string
   isLoading: boolean
+  balance: string
+  isStaker: boolean
+  isOwner: boolean
+  deadline: Date
 }
+
 type ActionType =
   | {
       type: 'SET_GREETING'
@@ -38,6 +54,22 @@ type ActionType =
       type: 'SET_LOADING'
       isLoading: StateType['isLoading']
     }
+  | {
+      type: 'SET_BALANCE'
+      balance: StateType['balance']
+    }
+  | {
+      type: 'SET_IS_STAKER'
+      isStaker: StateType['isStaker']
+    }
+  | {
+      type: 'SET_IS_OWNER'
+      isOwner: StateType['isOwner']
+    }
+  | {
+      type: 'SET_DEADLINE'
+      deadline: StateType['deadline']
+    }
 
 /**
  * Component
@@ -45,7 +77,11 @@ type ActionType =
 const initialState: StateType = {
   greeting: '',
   inputValue: '',
+  balance: '',
+  deadline: new Date(),
+  isStaker: false,
   isLoading: false,
+  isOwner: false,
 }
 
 function reducer(state: StateType, action: ActionType): StateType {
@@ -61,10 +97,30 @@ function reducer(state: StateType, action: ActionType): StateType {
         ...state,
         inputValue: action.inputValue,
       }
+    case 'SET_BALANCE':
+      return {
+        ...state,
+        balance: action.balance,
+      }
     case 'SET_LOADING':
       return {
         ...state,
         isLoading: action.isLoading,
+      }
+    case 'SET_IS_STAKER':
+      return {
+        ...state,
+        isStaker: action.isStaker,
+      }
+    case 'SET_IS_OWNER':
+      return {
+        ...state,
+        isOwner: action.isOwner,
+      }
+    case 'SET_DEADLINE':
+      return {
+        ...state,
+        deadline: action.deadline,
       }
     default:
       throw new Error()
@@ -74,6 +130,11 @@ function reducer(state: StateType, action: ActionType): StateType {
 function HomeIndex(): JSX.Element {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { account, chainId, library } = useEthers()
+  const stakeContract = useContract()
+  const [days, setDays] = useState(0)
+  const [hours, setHours] = useState(0)
+  const [minutes, setMinutes] = useState(0)
+  const [seconds, setSeconds] = useState(0)
 
   const isLocalChain =
     chainId === ChainId.Localhost || chainId === ChainId.Hardhat
@@ -88,41 +149,61 @@ function HomeIndex(): JSX.Element {
     signer: localProvider.getSigner(),
   })
 
-  // call the smart contract, read the current greeting value
-  async function fetchContractGreeting() {
-    if (library) {
-      const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        YourContract.abi,
-        library
-      ) as YourContractType
-      try {
-        const data = await contract.greeting()
-        dispatch({ type: 'SET_GREETING', greeting: data })
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.log('Error: ', err)
-      }
-    }
-  }
+  // // call the smart contract, read the current greeting value
+  // async function fetchContractGreeting() {
+  //   if (library) {
+  //     const contract = new ethers.Contract(
+  //       CONTRACT_ADDRESS,
+  //       YourContract.abi,
+  //       library
+  //     ) as YourContractType
+  //     try {
+  //       const data = await contract.greeting()
+  //       dispatch({ type: 'SET_GREETING', greeting: data })
+  //     } catch (err) {
+  //       // eslint-disable-next-line no-console
+  //       console.log('Error: ', err)
+  //     }
+  //   }
+  // }
 
-  // call the smart contract, send an update
-  async function setContractGreeting() {
+  // // call the smart contract, send an update
+  // async function setContractGreeting() {
+  //   if (!state.inputValue) return
+  //   if (library) {
+  //     dispatch({
+  //       type: 'SET_LOADING',
+  //       isLoading: true,
+  //     })
+  //     const signer = library.getSigner()
+  //     const contract = new ethers.Contract(
+  //       CONTRACT_ADDRESS,
+  //       YourContract.abi,
+  //       signer
+  //     ) as YourContractType
+  //     const transaction = await contract.setGreeting(state.inputValue)
+  //     await transaction.wait()
+  //     fetchContractGreeting()
+  //     dispatch({
+  //       type: 'SET_LOADING',
+  //       isLoading: false,
+  //     })
+  //   }
+  // }
+
+  const stakeFund = async () => {
     if (!state.inputValue) return
     if (library) {
       dispatch({
         type: 'SET_LOADING',
         isLoading: true,
       })
-      const signer = library.getSigner()
-      const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        YourContract.abi,
-        signer
-      ) as YourContractType
-      const transaction = await contract.setGreeting(state.inputValue)
+
+      const transaction = await stakeContract.stake({
+        value: utils.parseEther(state.inputValue),
+      })
       await transaction.wait()
-      fetchContractGreeting()
+      fetchContractBalance()
       dispatch({
         type: 'SET_LOADING',
         isLoading: false,
@@ -130,12 +211,125 @@ function HomeIndex(): JSX.Element {
     }
   }
 
-  function sendFunds(): void {
-    sendTransaction({
-      to: account,
-      value: utils.parseEther('0.1'),
-    })
+  const executeStake = async () => {
+    if (library) {
+      dispatch({
+        type: 'SET_LOADING',
+        isLoading: true,
+      })
+      const transaction = await stakeContract.execute()
+      await transaction.wait()
+      fetchContractBalance()
+      dispatch({
+        type: 'SET_LOADING',
+        isLoading: false,
+      })
+    }
   }
+
+  const withdraw = async () => {
+    if (library) {
+      dispatch({ type: 'SET_LOADING', isLoading: true })
+      // const signer = library.getSigner()
+      // const contract = new ethers.Contract(
+      //   CONTRACT_ADDRESS,
+      //   StakeContract.abi,
+      //   signer
+      // ) as StakeContractType
+      const transaction = await stakeContract.withdraw()
+      await transaction.wait()
+      fetchContractBalance()
+      dispatch({
+        type: 'SET_LOADING',
+        isLoading: false,
+      })
+    }
+  }
+
+  const fetchContractBalance = async () => {
+    if (library) {
+      const data = await stakeContract.getContractBalance()
+      console.log('HIT FETCH BALANCE')
+      dispatch({
+        type: 'SET_BALANCE',
+        balance: ethers.utils.formatEther(data),
+      })
+    }
+  }
+
+  const checkIfStaker = async () => {
+    if (library) {
+      const signer = library.getSigner()
+
+      const data = await stakeContract.balance(await signer.getAddress())
+      console.log('HIT IF STAKER')
+      dispatch({
+        type: 'SET_IS_STAKER',
+        isStaker: !data.isZero(),
+      })
+    }
+  }
+
+  const checkIfOwner = async () => {
+    if (library) {
+      const signer = library.getSigner()
+      const data = await stakeContract.owner()
+      console.log('HIT CEK OWNER')
+      dispatch({
+        type: 'SET_IS_OWNER',
+        isOwner: (await signer.getAddress()) == data,
+      })
+    }
+  }
+
+  const fetchDeadline = async () => {
+    if (library) {
+      const data = await stakeContract.deadline()
+      console.log('HIT DEADLINE')
+      dispatch({
+        type: 'SET_DEADLINE',
+        deadline: new Date(data.toNumber() * 1000),
+      })
+    }
+  }
+
+  // function sendFunds(): void {
+  //   sendTransaction({
+  //     to: account,
+  //     value: utils.parseEther('0.1'),
+  //   })
+  // }
+
+  useEffect(() => {
+    checkIfStaker()
+  }, [state.balance])
+
+  useEffect(() => {
+    const target = new Date(state.deadline)
+    const interval = setInterval(() => {
+      const now = new Date()
+      const difference = target.getTime() - now.getTime()
+      const d = Math.floor(difference / (1000 * 60 * 60 * 24))
+      setDays(d)
+      const h = Math.floor(
+        (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      )
+      setHours(h)
+      const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+      setMinutes(m)
+      const s = Math.floor((difference % (1000 * 60)) / 1000)
+      setSeconds(s)
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [state.deadline, library])
+
+  useEffect(() => {
+    // console.log(library.getSigner())
+    checkIfOwner()
+    fetchContractBalance()
+    fetchDeadline()
+    console.log('HIT USEEFFECT')
+  }, [library])
 
   return (
     <Layout>
@@ -160,17 +354,30 @@ function HomeIndex(): JSX.Element {
         <Text fontSize="xl">Contract Address: {CONTRACT_ADDRESS}</Text>
         <Divider my="8" borderColor="gray.400" />
         <Box>
+          <Text fontSize="lg">Balance: {state.balance}</Text>
+          <Button mt="2" colorScheme="teal" onClick={fetchContractBalance}>
+            Fetch Balance
+          </Button>
+        </Box>
+        <Divider my="8" borderColor="gray.400" />
+        <Box>
+          <Text fontSize="lg">Days: {days}</Text>
+          <Text fontSize="lg">Hours: {hours}</Text>
+          <Text fontSize="lg">Minutes: {minutes}</Text>
+          <Text fontSize="lg">Seconds: {seconds}</Text>
+        </Box>
+        {/* <Box>
           <Text fontSize="lg">Greeting: {state.greeting}</Text>
           <Button mt="2" colorScheme="teal" onClick={fetchContractGreeting}>
             Fetch Greeting
           </Button>
-        </Box>
+        </Box> */}
         <Divider my="8" borderColor="gray.400" />
         <Box>
           <Input
             bg="white"
             type="text"
-            placeholder="Enter a Greeting"
+            placeholder="Stake Your Ether Here!"
             onChange={(e) => {
               dispatch({
                 type: 'SET_INPUT_VALUE',
@@ -182,12 +389,32 @@ function HomeIndex(): JSX.Element {
             mt="2"
             colorScheme="teal"
             isLoading={state.isLoading}
-            onClick={setContractGreeting}
+            onClick={stakeFund}
           >
-            Set Greeting
+            Stake
           </Button>
         </Box>
         <Divider my="8" borderColor="gray.400" />
+        <Text mb="4">Withdraw Your Fund</Text>
+        <Button
+          colorScheme="teal"
+          onClick={withdraw}
+          isDisabled={
+            !state.isStaker && !(seconds <= 0) && state.balance === '0.0'
+          }
+        >
+          Withdraw
+        </Button>
+        <Divider my="8" borderColor="gray.400" />
+        <Text mb="4">Execute Stake</Text>
+        <Button
+          colorScheme="teal"
+          onClick={executeStake}
+          isDisabled={!state.isOwner}
+        >
+          Execute
+        </Button>
+        {/* <Divider my="8" borderColor="gray.400" />
         <Text mb="4">This button only works on a Local Chain.</Text>
         <Button
           colorScheme="teal"
@@ -195,10 +422,28 @@ function HomeIndex(): JSX.Element {
           isDisabled={!isLocalChain}
         >
           Send Funds From Local Hardhat Chain
-        </Button>
+        </Button> */}
       </Box>
     </Layout>
   )
 }
+
+// // This function gets called at build time on server-side.
+// // It won't be called on client-side, so you can even do
+// // direct database queries. See the "Technical details" section.
+// export async function getStaticProps() {
+//   // Call an external API endpoint to get posts.
+//   // You can use any data fetching library
+//   const res = await fetch('https://.../posts')
+//   const posts = await res.json()
+
+//   // By returning { props: { posts } }, the Blog component
+//   // will receive `posts` as a prop at build time
+//   return {
+//     props: {
+//       posts,
+//     },
+//   }
+// }
 
 export default HomeIndex

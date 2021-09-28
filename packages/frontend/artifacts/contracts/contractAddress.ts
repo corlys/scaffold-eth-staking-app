@@ -1,2 +1,2 @@
-export const YourContract = '0x8E3241B5a5E186D640626c0aB5545C3201EA7D40'
-export const MulticallContract = '0x83664c66FC0c69eFdc0eA41Fd8e0098b033b7C11'
+export const YourContract = '0x5023177c35a54c8Ad7447814C7d5cEF8165FfE1D'
+export const MulticallContract = '0x8D756A6eC4dFB835665602755Ec5174e2FFc5e94'

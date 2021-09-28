@@ -2,20 +2,20 @@ import { useEffect, useState } from 'react'
 import { Box, Button, Divider, Heading, Input, Text } from '@chakra-ui/react'
 import { ChainId, useEthers, useSendTransaction } from '@usedapp/core'
 import {
-  useBalance,
-  useDeadline,
-  useOwner,
-  useContractBalance,
+  // useBalance,
+  // useDeadline,
+  // useOwner,
+  // useContractBalance,
   useContract,
 } from '../hooks/index'
 import { ethers, providers, utils } from 'ethers'
 import React, { useReducer } from 'react'
 import { YourContract as LOCAL_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
-import StakeContract from '../artifacts/contracts/Staking.sol/Staking.json'
-import YourContract from '../artifacts/contracts/YourContract.sol/YourContract.json'
+// import StakeContract from '../artifacts/contracts/Staking.sol/Staking.json'
+// import YourContract from '../artifacts/contracts/YourContract.sol/YourContract.json'
 import { Layout } from '../components/layout/Layout'
-import { YourContract as YourContractType } from '../types/typechain'
-import { Balance } from '../components/Balance'
+// import { YourContract as YourContractType } from '../types/typechain'
+// import { Balance } from '../components/Balance'
 
 /**
  * Constants & Helpers
@@ -26,7 +26,7 @@ const localProvider = new providers.StaticJsonRpcProvider(
 )
 
 export const ROPSTEN_CONTRACT_ADDRESS =
-  '0x8E3241B5a5E186D640626c0aB5545C3201EA7D40'
+  '0x5023177c35a54c8Ad7447814C7d5cEF8165FfE1D'
 
 /**
  * Prop Types
@@ -136,8 +136,8 @@ function HomeIndex(): JSX.Element {
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
 
-  const isLocalChain =
-    chainId === ChainId.Localhost || chainId === ChainId.Hardhat
+  // const isLocalChain =
+  //   chainId === ChainId.Localhost || chainId === ChainId.Hardhat
 
   const CONTRACT_ADDRESS =
     chainId === ChainId.Ropsten
@@ -145,9 +145,9 @@ function HomeIndex(): JSX.Element {
       : LOCAL_CONTRACT_ADDRESS
 
   // Use the localProvider as the signer to send ETH to our wallet
-  const { sendTransaction } = useSendTransaction({
-    signer: localProvider.getSigner(),
-  })
+  // const { sendTransaction } = useSendTransaction({
+  //   signer: localProvider.getSigner(),
+  // })
 
   // // call the smart contract, read the current greeting value
   // async function fetchContractGreeting() {
@@ -249,7 +249,7 @@ function HomeIndex(): JSX.Element {
   const fetchContractBalance = async () => {
     if (library) {
       const data = await stakeContract.getContractBalance()
-      console.log('HIT FETCH BALANCE')
+      // console.log('HIT FETCH BALANCE')
       dispatch({
         type: 'SET_BALANCE',
         balance: ethers.utils.formatEther(data),
@@ -262,7 +262,7 @@ function HomeIndex(): JSX.Element {
       const signer = library.getSigner()
 
       const data = await stakeContract.balance(await signer.getAddress())
-      console.log('HIT IF STAKER')
+      // console.log('HIT IF STAKER')
       dispatch({
         type: 'SET_IS_STAKER',
         isStaker: !data.isZero(),
@@ -274,7 +274,7 @@ function HomeIndex(): JSX.Element {
     if (library) {
       const signer = library.getSigner()
       const data = await stakeContract.owner()
-      console.log('HIT CEK OWNER')
+      // console.log('HIT CEK OWNER')
       dispatch({
         type: 'SET_IS_OWNER',
         isOwner: (await signer.getAddress()) == data,
@@ -285,7 +285,7 @@ function HomeIndex(): JSX.Element {
   const fetchDeadline = async () => {
     if (library) {
       const data = await stakeContract.deadline()
-      console.log('HIT DEADLINE')
+      // console.log('HIT DEADLINE')
       dispatch({
         type: 'SET_DEADLINE',
         deadline: new Date(data.toNumber() * 1000),
@@ -328,7 +328,7 @@ function HomeIndex(): JSX.Element {
     checkIfOwner()
     fetchContractBalance()
     fetchDeadline()
-    console.log('HIT USEEFFECT')
+    // console.log('HIT USEEFFECT')
   }, [library])
 
   return (

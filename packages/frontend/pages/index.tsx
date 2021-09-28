@@ -8,7 +8,7 @@ import {
   // useContractBalance,
   useContract,
 } from '../hooks/index'
-import { ethers, providers, utils } from 'ethers'
+import { ethers, utils } from 'ethers'
 import React, { useReducer } from 'react'
 import { YourContract as LOCAL_CONTRACT_ADDRESS } from '../artifacts/contracts/contractAddress'
 // import StakeContract from '../artifacts/contracts/Staking.sol/Staking.json'

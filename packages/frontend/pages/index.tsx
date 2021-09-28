@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Box, Button, Divider, Heading, Input, Text } from '@chakra-ui/react'
-import { ChainId, useEthers, useSendTransaction } from '@usedapp/core'
+import { ChainId, useEthers } from '@usedapp/core'
 import {
   // useBalance,
   // useDeadline,
@@ -21,9 +21,9 @@ import { Layout } from '../components/layout/Layout'
  * Constants & Helpers
  */
 
-const localProvider = new providers.StaticJsonRpcProvider(
-  'http://localhost:8545'
-)
+// const localProvider = new providers.StaticJsonRpcProvider(
+//   'http://localhost:8545'
+// )
 
 export const ROPSTEN_CONTRACT_ADDRESS =
   '0x5023177c35a54c8Ad7447814C7d5cEF8165FfE1D'
@@ -129,7 +129,7 @@ function reducer(state: StateType, action: ActionType): StateType {
 
 function HomeIndex(): JSX.Element {
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { account, chainId, library } = useEthers()
+  const { chainId, library } = useEthers()
   const stakeContract = useContract()
   const [days, setDays] = useState(0)
   const [hours, setHours] = useState(0)

@@ -4,10 +4,10 @@ import { Contract } from '../../../models/Contract'
 
 // Interface to defining our object of response functions
 export interface ResponseFuncs {
-  GET?: Function
-  POST?: Function
-  PUT?: Function
-  DELETE?: Function
+  GET?: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
+  POST?: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
+  PUT?: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
+  DELETE?: (req: NextApiRequest, res: NextApiResponse) => Promise<void>
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -24,7 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const handleCase: ResponseFuncs = {
     // RESPONSE FOR GET REQUESTS
     GET: async (req: NextApiRequest, res: NextApiResponse) => {
-      const conn = await dbConnect() // connect to database
+      await dbConnect() // connect to database
       res.json(await Contract.find({ contractAddress: address }).catch(catcher))
     },
     // RESPONSE PUT and DELETE

@@ -338,7 +338,7 @@ function HomeIndex(): JSX.Element {
   return (
     <Layout>
       <Heading as="h1" mb="8">
-        Next.js Ethereum Starter
+        Staking Page
       </Heading>
       <Button
         as="a"

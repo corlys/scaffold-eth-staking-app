@@ -84,7 +84,7 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
                   Home
                 </Link>
               </NextLink>
-              <NextLink href="/graph-example" passHref>
+              {/* <NextLink href="/graph-example" passHref>
                 <Link px="4" py="1">
                   Graph Example
                 </Link>
@@ -93,7 +93,7 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
                 <Link px="4" py="1">
                   Signature Example
                 </Link>
-              </NextLink>
+              </NextLink> */}
             </Flex>
             {account ? (
               <Flex

@@ -1,20 +1,12 @@
 import NextLink from 'next/link'
-import {
-  Box,
-  Button,
-  Divider,
-  Heading,
-  Input,
-  Text,
-  Link,
-} from '@chakra-ui/react'
+import { Box, Button, Divider, Heading, Text, Link } from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
-import { dbConnect } from '../utils/connection'
+// import { dbConnect } from '../utils/connection'
 import { ContractDocument } from '../models/Contract'
-import { ethers, utils } from 'ethers'
+// import { ethers, utils } from 'ethers'
 import { useContractFactory } from '../hooks'
 import { Layout } from '../components/layout/Layout'
-import { Contract } from '@usedapp/core/node_modules/ethers'
+// import { Contract } from '@usedapp/core/node_modules/ethers'
 
 export interface IndexProps {
   contracts: ContractDocument[]
@@ -98,7 +90,6 @@ export async function getServerSideProps() {
   const { API_URL } = process.env
   const res = await fetch(`${API_URL}contracts`)
   const contracts = await res.json()
-  console.log(contracts, API_URL)
   return {
     props: { contracts, api_url: API_URL },
   }

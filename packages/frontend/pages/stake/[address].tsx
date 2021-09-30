@@ -252,7 +252,7 @@ function HomeIndex(): JSX.Element {
   const fetchContractBalance = async () => {
     if (library) {
       const data = await stakeContract.getContractBalance()
-      console.log(data.toString())
+      // console.log(data.toString())
       dispatch({
         type: 'SET_BALANCE',
         balance: ethers.utils.formatEther(data),
@@ -265,7 +265,7 @@ function HomeIndex(): JSX.Element {
       const signer = library.getSigner()
 
       const data = await stakeContract.balance(await signer.getAddress())
-      console.log(data.toString())
+      // console.log(data.toString())
       dispatch({
         type: 'SET_IS_STAKER',
         isStaker: !data.isZero(),
@@ -331,7 +331,7 @@ function HomeIndex(): JSX.Element {
     checkIfOwner()
     fetchContractBalance()
     fetchDeadline()
-    console.log(state.isStaker, state.balance)
+    // console.log(state.isStaker, state.balance)
     // console.log('HIT USEEFFECT')
   }, [library])
 

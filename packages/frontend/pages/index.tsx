@@ -32,8 +32,8 @@ const Home = (props: IndexProps): JSX.Element => {
           contractAddress,
           creator: await signer.getAddress(),
         }
-        console.log(saveAddress)
-        const res = fetch(`${api_url}contracts`, {
+        // console.log(saveAddress)
+        await fetch(`${api_url}contracts`, {
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ const Home = (props: IndexProps): JSX.Element => {
       }
       // const saveAddress = await fetch(`${API_URL}contracts`)
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
   return (

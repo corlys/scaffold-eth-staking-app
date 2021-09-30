@@ -19,6 +19,9 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+packages/frontend/.env.local
+packages/frontend/.env.development
+packages/frontend/.env.production
 
 # vercel
 .vercel

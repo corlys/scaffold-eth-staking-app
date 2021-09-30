@@ -39,6 +39,7 @@ contract Staking {
   function withdraw() external payable {
     require(block.timestamp > deadline, "Not Yet Met");
     (bool success, ) = msg.sender.call{value:balance[msg.sender]}("");
+    balance[msg.sender] = 0;
     require(success, "Send Ether Failure");
   }
 

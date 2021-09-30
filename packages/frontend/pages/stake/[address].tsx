@@ -138,6 +138,7 @@ function HomeIndex(): JSX.Element {
   const [hours, setHours] = useState(0)
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
+  const [threshold, setThreshold] = useState(0)
 
   // const isLocalChain =
   //   chainId === ChainId.Localhost || chainId === ChainId.Hardhat
@@ -207,6 +208,11 @@ function HomeIndex(): JSX.Element {
       })
       await transaction.wait()
       fetchContractBalance()
+      // TODO: input value not returning to empty
+      dispatch({
+        type: 'SET_INPUT_VALUE',
+        inputValue: '',
+      })
       dispatch({
         type: 'SET_LOADING',
         isLoading: false,
@@ -223,6 +229,7 @@ function HomeIndex(): JSX.Element {
       const transaction = await stakeContract.execute()
       await transaction.wait()
       fetchContractBalance()
+      fetchDeadline()
       dispatch({
         type: 'SET_LOADING',
         isLoading: false,
@@ -260,6 +267,17 @@ function HomeIndex(): JSX.Element {
     }
   }
 
+  const fetchThreshold = async () => {
+    if (library) {
+      const data = await stakeContract.threshold()
+      const temp = utils.formatEther(data.toString())
+      // console.log(temp)
+      setThreshold(parseFloat(temp))
+      // console.log('HIT', data)
+      // setThreshold(utils.parseEther(data.toString()).toNumber())
+    }
+  }
+
   const checkIfStaker = async () => {
     if (library) {
       const signer = library.getSigner()
@@ -277,11 +295,14 @@ function HomeIndex(): JSX.Element {
     if (library) {
       const signer = library.getSigner()
       const data = await stakeContract.owner()
-      // console.log('HIT CEK OWNER')
+      // console.log(data)
+      // console.log(await signer.getAddress())
+      // console.log(data == (await signer.getAddress()))
       dispatch({
         type: 'SET_IS_OWNER',
         isOwner: (await signer.getAddress()) == data,
       })
+      // console.log(state.isOwner)
     }
   }
 
@@ -331,6 +352,7 @@ function HomeIndex(): JSX.Element {
     checkIfOwner()
     fetchContractBalance()
     fetchDeadline()
+    fetchThreshold()
     // console.log(state.isStaker, state.balance)
     // console.log('HIT USEEFFECT')
   }, [library])
@@ -355,13 +377,14 @@ function HomeIndex(): JSX.Element {
         This page only works on the ROPSTEN Testnet
       </Text>
       <Box maxWidth="container.sm" p="8" mt="8" bg="gray.100">
-        <Text fontSize="xl">Contract Address: {CONTRACT_ADDRESS}</Text>
+        <Text fontSize="xl">Contract Address: {address}</Text>
         <Divider my="8" borderColor="gray.400" />
         <Box>
           <Text fontSize="lg">Balance: {state.balance}</Text>
-          <Button mt="2" colorScheme="teal" onClick={fetchContractBalance}>
+          <Text fontSize="lg">Threshold/Goal: {threshold}</Text>
+          {/* <Button mt="2" colorScheme="teal" onClick={fetchContractBalance}>
             Fetch Balance
-          </Button>
+          </Button> */}
         </Box>
         <Divider my="8" borderColor="gray.400" />
         <Box>
@@ -400,6 +423,7 @@ function HomeIndex(): JSX.Element {
             colorScheme="teal"
             isLoading={state.isLoading}
             onClick={stakeFund}
+            isDisabled={seconds <= 0}
           >
             Stake
           </Button>
@@ -409,7 +433,9 @@ function HomeIndex(): JSX.Element {
         <Button
           colorScheme="teal"
           onClick={withdraw}
-          isDisabled={state.balance === '0.0' && !state.isStaker} //
+          isDisabled={
+            seconds <= 0 && parseFloat(state.balance) > 0 ? false : true
+          } //
         >
           Withdraw
         </Button>
@@ -418,7 +444,20 @@ function HomeIndex(): JSX.Element {
         <Button
           colorScheme="teal"
           onClick={executeStake}
-          isDisabled={!state.isOwner}
+          // isDisabled={!state.isOwner} //true
+          // isDisabled={parseFloat(state.balance) <= threshold} //false
+          // isDisabled={
+          //   !state.isOwner &&
+          //   parseFloat(state.balance) <= threshold &&
+          //   seconds <= 0
+          // }
+          isDisabled={
+            state.isOwner &&
+            seconds >= 0 &&
+            parseFloat(state.balance) >= threshold
+              ? false
+              : true
+          }
         >
           Execute
         </Button>

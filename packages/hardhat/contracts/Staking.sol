@@ -31,8 +31,9 @@ contract Staking {
 
   function execute() external payable {
     require(msg.sender == owner, "Currently, only owner can execute");
-    require(block.timestamp < deadline && threshold < address(this).balance, "Not yet met");
+    require(block.timestamp < deadline && threshold <= address(this).balance, "Not yet met");
     (bool success, ) = recipient.call{value:address(this).balance}("");
+    deadline = block.timestamp;
     require(success, "Send Ether Failure");
   }
 

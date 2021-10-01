@@ -471,7 +471,7 @@ function HomeIndex(): JSX.Element {
         >
           Send Funds From Local Hardhat Chain
         </Button> */}
-        <Loading isOpen={state.isLoading} onClose={() => {}} />
+        <Loading isOpen={state.isLoading} onClose={() => undefined} />
       </Box>
     </Layout>
   )

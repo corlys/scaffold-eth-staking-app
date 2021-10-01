@@ -6,8 +6,8 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
-  Progress,
-  Text,
+  // Progress,
+  // Text,
 } from '@chakra-ui/react'
 
 const Loading: React.FC<Omit<ModalProps, 'children' | 'closeOnOverlayClick'>> =

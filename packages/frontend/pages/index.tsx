@@ -1,4 +1,4 @@
-import { useState, useRef, ReactNode, useEffect } from 'react'
+import { useState, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import {
@@ -30,11 +30,11 @@ export interface IndexProps {
   api_url: string
 }
 
-interface IToastAsyncProps {
-  title?: ReactNode
-  description?: ReactNode
-  id?: string | number
-}
+// interface IToastAsyncProps {
+//   title?: ReactNode
+//   description?: ReactNode
+//   id?: string | number
+// }
 
 // const ToastAsync = ({
 //   title = 'Loading...',
@@ -169,7 +169,7 @@ const Home = (props: IndexProps): JSX.Element => {
             <Divider my="8" borderColor="gray.400" />
           </>
         ))}
-        <Loading isOpen={isLoading} onClose={() => {}} />
+        <Loading isOpen={isLoading} onClose={() => undefined} />
       </Box>
     </Layout>
   )

@@ -9,6 +9,7 @@ import {
   // useContractBalance,
   useContract,
 } from '../../hooks/index'
+import Loading from '../../components/Modals/Loading'
 import { ethers, utils } from 'ethers'
 import React, { useReducer } from 'react'
 // import { YourContract as CONTRACT_ADDRESS } from '../../artifacts/contracts/contractAddress'
@@ -362,7 +363,7 @@ function HomeIndex(): JSX.Element {
       <Heading as="h1" mb="8">
         Staking Page
       </Heading>
-      <Button
+      {/* <Button
         as="a"
         size="lg"
         colorScheme="teal"
@@ -372,7 +373,7 @@ function HomeIndex(): JSX.Element {
         rel="noopener noreferrer"
       >
         Get the source code!
-      </Button>
+      </Button> */}
       <Text mt="8" fontSize="xl">
         This page only works on the ROPSTEN Testnet
       </Text>
@@ -470,6 +471,7 @@ function HomeIndex(): JSX.Element {
         >
           Send Funds From Local Hardhat Chain
         </Button> */}
+        <Loading isOpen={state.isLoading} onClose={() => {}} />
       </Box>
     </Layout>
   )

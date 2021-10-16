@@ -51,7 +51,9 @@ const Home = (props: IndexProps): JSX.Element => {
           router.push(`/`)
         })
       }
-    } catch (error) {}
+    } catch (error) {
+      // console.log(error)
+    }
   }
   return (
     <Layout>

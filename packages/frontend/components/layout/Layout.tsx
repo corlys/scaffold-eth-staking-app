@@ -15,7 +15,6 @@ import {
   MenuList,
   SimpleGrid,
   Text,
-  Spacer,
 } from '@chakra-ui/react'
 import { useEthers, useNotifications } from '@usedapp/core'
 import blockies from 'blockies-ts'

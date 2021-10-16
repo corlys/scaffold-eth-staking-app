@@ -4,6 +4,16 @@ import "@typechain/hardhat";
 import { task } from "hardhat/config";
 import { HardhatUserConfig } from "hardhat/types";
 
+import { config as dotenvConfig } from "dotenv";
+import { resolve } from "path";
+dotenvConfig({ path: resolve(__dirname, "./.env") });
+
+const ALPHA_PKEY = process.env.ALPHA_PKEY || "";
+const BETA_PKEY = process.env.BETA_PKEY || "";
+const GAMMA_PKEY = process.env.GAMMA_PKEY || "";
+const THETA_PKEY = process.env.THETA_PKEY || "";
+const INFURA_KEY = process.env.INFURA_KEY || "";
+
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (_args, hre) => {
@@ -25,19 +35,15 @@ const config: HardhatUserConfig = {
   paths: {
     artifacts: "../frontend/artifacts",
   },
+  defaultNetwork: "ropsten",
   networks: {
     hardhat: {
       chainId: 1337,
     },
     ropsten: {
       chainId: 3,
-      url: `https://ropsten.infura.io/v3/36ac3f601d2c4510a4d0ee538a293ef9`,
-      accounts: [
-        "faa9e3bc5f4ba92a654431e997e906904997775c3f3b42e4e85f35a27aab6452",
-        "20f423490af444641f55f07051cce2be9d191f3094ebd32f9b98e76aea138eae",
-        "a65b727ed8f73d1b6266ef1abe9d567cc621c24831a54d5e001563788daf4eaf",
-        "87b37f3237eeddf3f44942b23b384a69a90c3a09ae32bd4bbb949439b9d4e817",
-      ],
+      url: `https://ropsten.infura.io/v3/${INFURA_KEY}`,
+      accounts: [ALPHA_PKEY, BETA_PKEY, GAMMA_PKEY, THETA_PKEY],
     },
   },
   typechain: {

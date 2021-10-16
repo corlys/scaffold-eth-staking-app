@@ -1,6 +1,14 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Box, Button, Divider, Heading, Input, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Divider,
+  Heading,
+  Input,
+  Text,
+  useColorMode,
+} from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
 import {
   // useBalance,
@@ -26,9 +34,6 @@ import { Layout } from '../../components/layout/Layout'
 // const localProvider = new providers.StaticJsonRpcProvider(
 //   'http://localhost:8545'
 // )
-
-export const ROPSTEN_CONTRACT_ADDRESS =
-  '0x5023177c35a54c8Ad7447814C7d5cEF8165FfE1D'
 
 /**
  * Prop Types
@@ -131,6 +136,7 @@ function reducer(state: StateType, action: ActionType): StateType {
 
 function HomeIndex(): JSX.Element {
   const router = useRouter()
+  const { colorMode } = useColorMode()
   const { address } = router.query
   const [state, dispatch] = useReducer(reducer, initialState)
   const { library } = useEthers()
@@ -140,61 +146,6 @@ function HomeIndex(): JSX.Element {
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
   const [threshold, setThreshold] = useState(0)
-
-  // const isLocalChain =
-  //   chainId === ChainId.Localhost || chainId === ChainId.Hardhat
-
-  // const CONTRACT_ADDRESS =
-  //   chainId === ChainId.Ropsten
-  //     ? ROPSTEN_CONTRACT_ADDRESS
-  //     : LOCAL_CONTRACT_ADDRESS
-
-  // Use the localProvider as the signer to send ETH to our wallet
-  // const { sendTransaction } = useSendTransaction({
-  //   signer: localProvider.getSigner(),
-  // })
-
-  // // call the smart contract, read the current greeting value
-  // async function fetchContractGreeting() {
-  //   if (library) {
-  //     const contract = new ethers.Contract(
-  //       CONTRACT_ADDRESS,
-  //       YourContract.abi,
-  //       library
-  //     ) as YourContractType
-  //     try {
-  //       const data = await contract.greeting()
-  //       dispatch({ type: 'SET_GREETING', greeting: data })
-  //     } catch (err) {
-  //       // eslint-disable-next-line no-console
-  //       console.log('Error: ', err)
-  //     }
-  //   }
-  // }
-
-  // // call the smart contract, send an update
-  // async function setContractGreeting() {
-  //   if (!state.inputValue) return
-  //   if (library) {
-  //     dispatch({
-  //       type: 'SET_LOADING',
-  //       isLoading: true,
-  //     })
-  //     const signer = library.getSigner()
-  //     const contract = new ethers.Contract(
-  //       CONTRACT_ADDRESS,
-  //       YourContract.abi,
-  //       signer
-  //     ) as YourContractType
-  //     const transaction = await contract.setGreeting(state.inputValue)
-  //     await transaction.wait()
-  //     fetchContractGreeting()
-  //     dispatch({
-  //       type: 'SET_LOADING',
-  //       isLoading: false,
-  //     })
-  //   }
-  // }
 
   const stakeFund = async () => {
     if (!state.inputValue) return
@@ -272,10 +223,7 @@ function HomeIndex(): JSX.Element {
     if (library) {
       const data = await stakeContract.threshold()
       const temp = utils.formatEther(data.toString())
-      // console.log(temp)
       setThreshold(parseFloat(temp))
-      // console.log('HIT', data)
-      // setThreshold(utils.parseEther(data.toString()).toNumber())
     }
   }
 
@@ -284,7 +232,6 @@ function HomeIndex(): JSX.Element {
       const signer = library.getSigner()
 
       const data = await stakeContract.balance(await signer.getAddress())
-      // console.log(data.toString())
       dispatch({
         type: 'SET_IS_STAKER',
         isStaker: !data.isZero(),
@@ -296,14 +243,10 @@ function HomeIndex(): JSX.Element {
     if (library) {
       const signer = library.getSigner()
       const data = await stakeContract.owner()
-      // console.log(data)
-      // console.log(await signer.getAddress())
-      // console.log(data == (await signer.getAddress()))
       dispatch({
         type: 'SET_IS_OWNER',
         isOwner: (await signer.getAddress()) == data,
       })
-      // console.log(state.isOwner)
     }
   }
 
@@ -317,13 +260,6 @@ function HomeIndex(): JSX.Element {
       })
     }
   }
-
-  // function sendFunds(): void {
-  //   sendTransaction({
-  //     to: account,
-  //     value: utils.parseEther('0.1'),
-  //   })
-  // }
 
   useEffect(() => {
     checkIfStaker()
@@ -349,13 +285,10 @@ function HomeIndex(): JSX.Element {
   }, [state.deadline])
 
   useEffect(() => {
-    // console.log(library.getSigner())
     checkIfOwner()
     fetchContractBalance()
     fetchDeadline()
     fetchThreshold()
-    // console.log(state.isStaker, state.balance)
-    // console.log('HIT USEEFFECT')
   }, [library])
 
   return (
@@ -377,7 +310,12 @@ function HomeIndex(): JSX.Element {
       <Text mt="8" fontSize="xl">
         This page only works on the ROPSTEN Testnet
       </Text>
-      <Box maxWidth="container.sm" p="8" mt="8" bg="gray.100">
+      <Box
+        maxWidth="container.sm"
+        p="8"
+        mt="8"
+        bg={colorMode === 'light' ? 'gray.100' : 'gray.600'}
+      >
         <Text fontSize="xl">Contract Address: {address}</Text>
         <Divider my="8" borderColor="gray.400" />
         <Box>

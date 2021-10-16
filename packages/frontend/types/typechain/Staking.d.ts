@@ -59,7 +59,7 @@ interface StakingInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "Stake(address,uint256)": EventFragment;
+    "Stake(address,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Stake"): EventFragment;
@@ -181,10 +181,11 @@ export class Staking extends BaseContract {
   filters: {
     Stake(
       staker?: null,
+      currentStakerBalance?: null,
       amount?: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { staker: string; amount: BigNumber }
+      [string, BigNumber, BigNumber],
+      { staker: string; currentStakerBalance: BigNumber; amount: BigNumber }
     >;
   };
 

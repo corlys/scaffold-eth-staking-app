@@ -15,7 +15,7 @@ contract Staking {
   
   address public recipient; 
 
-  event Stake(address staker, uint256 amount);
+  event Stake(address staker, uint256 currentStakerBalance, uint256 amount);
 
   constructor (address _to) {
     owner = msg.sender;
@@ -25,8 +25,7 @@ contract Staking {
 
   function stake() external payable {
     balance[msg.sender] += msg.value;
-    console.log("sadsdas", balance[msg.sender]);
-    emit Stake(msg.sender, balance[msg.sender]);
+    emit Stake(msg.sender, balance[msg.sender], msg.value);
   }
 
   function execute() external payable {

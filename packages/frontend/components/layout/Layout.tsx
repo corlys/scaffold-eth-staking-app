@@ -15,6 +15,7 @@ import {
   MenuList,
   SimpleGrid,
   Text,
+  Spacer,
 } from '@chakra-ui/react'
 import { useEthers, useNotifications } from '@usedapp/core'
 import blockies from 'blockies-ts'
@@ -24,6 +25,7 @@ import { getErrorMessage } from '../../lib/utils'
 import { Balance } from '../Balance'
 import { ConnectWallet } from '../ConnectWallet'
 import { Head, MetaProps } from './Head'
+import ThemeToggle from './ThemeToggle'
 
 // Extends `window` to add `ethereum`.
 declare global {
@@ -117,9 +119,13 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
                     </MenuItem>
                   </MenuList>
                 </Menu>
+                <ThemeToggle />
               </Flex>
             ) : (
-              <ConnectWallet />
+              <>
+                <ConnectWallet />
+                <ThemeToggle />
+              </>
             )}
           </SimpleGrid>
         </Container>

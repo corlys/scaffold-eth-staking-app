@@ -22,7 +22,7 @@ export function ConnectWallet(): JSX.Element {
   return (
     <>
       <Box
-        order={[-1, null, null, 2]}
+        order={[-1]} //need to learn about orders more
         textAlign={['left', null, null, 'right']}
       >
         <Button colorScheme="teal" variant="outline" onClick={onOpen}>

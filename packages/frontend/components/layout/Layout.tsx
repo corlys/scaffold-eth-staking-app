@@ -15,6 +15,7 @@ import {
   MenuList,
   SimpleGrid,
   Text,
+  HStack,
 } from '@chakra-ui/react'
 import { useEthers, useNotifications } from '@usedapp/core'
 import blockies from 'blockies-ts'
@@ -121,10 +122,10 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
                 <ThemeToggle />
               </Flex>
             ) : (
-              <>
-                <ConnectWallet />
+              <HStack spacing="32" alignItems="center" justify="flex-end">
                 <ThemeToggle />
-              </>
+                <ConnectWallet />
+              </HStack>
             )}
           </SimpleGrid>
         </Container>

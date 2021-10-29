@@ -72,6 +72,7 @@ const Home = (props: IndexProps): JSX.Element => {
         Deploy Staking Contract
       </Button>
       <Box
+        borderRadius="8"
         maxWidth="container.sm"
         p="8"
         mt="8"
